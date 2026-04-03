@@ -5,25 +5,22 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 get_header();
 ?>
-<section class="page-section resume-page">
+<section class="page-section resume-page resume-v2">
 	<div class="container">
-		<div class="resume-hero card">
+		<div class="resume-v2-head card">
 			<p class="resume-eyebrow">Resume</p>
 			<h2>Kỹ năng &amp; Học vấn</h2>
-			<p class="meta">
-				Sinh viên ngành Công nghệ Thông tin tại <strong>Trường Đại học Tây Nguyên</strong>, định hướng
-				trở thành Web/Backend Developer.
-			</p>
+			<p class="meta">Sinh viên CNTT tại <strong>Trường Đại học Tây Nguyên</strong>, định hướng Backend Developer.</p>
 		</div>
 
-		<div class="grid-2">
-			<div class="card resume-card">
+		<div class="resume-v2-grid">
+			<div class="card resume-card resume-v2-timeline">
 				<h3>Học vấn (Timeline)</h3>
 				<ul class="timeline resume-timeline">
 					<li>
 						<span class="timeline-year">2023 - Nay</span>
 						<h4>Sinh viên CNTT - Trường Đại học Tây Nguyên</h4>
-						<p>Tập trung học nền tảng lập trình, cấu trúc dữ liệu, cơ sở dữ liệu và phát triển ứng dụng web.</p>
+						<p>Học nền tảng lập trình, cấu trúc dữ liệu, cơ sở dữ liệu và phát triển web.</p>
 					</li>
 					<li>
 						<span class="timeline-year">2024</span>
@@ -33,17 +30,17 @@ get_header();
 					<li>
 						<span class="timeline-year">2025</span>
 						<h4>Phát triển dự án thực tế</h4>
-						<p>Thực hiện đồ án nhóm và dự án cá nhân: website quản lý, portfolio và ứng dụng học tập.</p>
+						<p>Thực hiện đồ án nhóm và dự án cá nhân: website quản lý, portfolio.</p>
 					</li>
 					<li>
 						<span class="timeline-year">2026 (Mục tiêu)</span>
 						<h4>Nâng cao năng lực nghề nghiệp</h4>
-						<p>Hoàn thiện kỹ năng backend, làm việc theo quy trình Git và tham gia thực tập Web Developer.</p>
+						<p>Hoàn thiện backend, làm việc theo quy trình Git và tham gia thực tập.</p>
 					</li>
 				</ul>
 			</div>
 
-			<div class="card resume-card">
+			<div class="card resume-card resume-v2-skills">
 				<h3>Kỹ năng</h3>
 
 				<div class="skill-group">

@@ -17,9 +17,12 @@ $project_query = new WP_Query(
 
 		get_header();
 		?>
-		<section class="page-section">
+		<section class="page-section projects-v2">
 			<div class="container">
-				<h2>Dự án / Portfolio</h2>
+				<div class="projects-v2-head card">
+					<h2>Dự án / Portfolio</h2>
+					<p class="meta">Một số dự án tiêu biểu mình đã thực hiện trong quá trình học tập.</p>
+				</div>
 				<div class="projects-list">
 					<?php if ( $project_query->have_posts() ) : ?>
 						<?php $project_index = 0; ?>
@@ -82,6 +85,11 @@ $project_query = new WP_Query(
 							</article>
 						<?php endwhile; ?>
 						<?php wp_reset_postdata(); ?>
+					<?php else : ?>
+						<div class="card project-card">
+							<h3>Chưa có dữ liệu dự án</h3>
+							<p class="meta">Vui lòng thêm bài viết thuộc loại nội dung <strong>portfolio_project</strong> trong trang quản trị.</p>
+						</div>
 					<?php endif; ?>
 				</div>
 			</div>

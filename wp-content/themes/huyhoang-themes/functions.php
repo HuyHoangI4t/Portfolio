@@ -21,9 +21,9 @@ add_action( 'wp_enqueue_scripts', 'huyhoang_enqueue_assets' );
 function huyhoang_nav_items() {
 	return array(
 		home_url( '/' )            => 'Trang chủ',
-		home_url( '/resume/' )     => '',
-		home_url( '/projects/' )   => 'Projects',
-		home_url( '/contact/' )    => 'Contact',
+		home_url( '/resume/' )     => 'Kỹ năng & Học vấn',
+		home_url( '/projects/' )   => 'Dự án',
+		home_url( '/contact/' )    => 'Liên hệ',
 	);
 }
 
