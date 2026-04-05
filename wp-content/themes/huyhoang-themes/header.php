@@ -11,16 +11,17 @@ if ( ! defined( 'ABSPATH' ) ) {
 </head>
 <body <?php body_class(); ?>>
 <?php wp_body_open(); ?>
+<?php $brand_name = function_exists( 'portfolio_get_config_value' ) ? portfolio_get_config_value( 'PORTFOLIO_BRAND_NAME', 'Portfolio' ) : 'Portfolio'; ?>
 <header class="site-header">
 	<div class="container navbar">
-		<a class="brand" href="<?php echo esc_url( home_url( '/' ) ); ?>">HuyHoang Portfolio</a>
+		<a class="brand" href="<?php echo esc_url( home_url( '/' ) ); ?>"><?php echo esc_html( $brand_name ); ?></a>
 		<button class="nav-toggle" type="button" aria-expanded="false" aria-controls="main-nav" aria-label="Mở menu">
 			<span></span>
 			<span></span>
 			<span></span>
 		</button>
 		<nav class="nav-links" id="main-nav" aria-label="Main Navigation">
-			<?php foreach ( huyhoang_nav_items() as $url => $label ) : ?>
+			<?php foreach ( portfolio_nav_items() as $url => $label ) : ?>
 				<a href="<?php echo esc_url( $url ); ?>"><?php echo esc_html( $label ); ?></a>
 			<?php endforeach; ?>
 		</nav>

@@ -4,6 +4,16 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 get_header();
+
+$get_config = function_exists( 'portfolio_get_config_value' )
+	? 'portfolio_get_config_value'
+	: static function( $key, $default = '' ) {
+		$env = getenv( $key );
+		return false !== $env && '' !== (string) $env ? (string) $env : (string) $default;
+	};
+
+$owner_name = $get_config( 'PORTFOLIO_OWNER_NAME', 'Your Name' );
+$profile_subtitle = $get_config( 'PORTFOLIO_PROFILE_SUBTITLE', 'Software Developer / IT Student' );
 ?>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
@@ -12,8 +22,8 @@ get_header();
 		<div class="home-v2-hero card">
 			<div>
 				<p class="home-v2-kicker">Portfolio cá nhân</p>
-				<h1>Xin chào, mình là <strong>Nguyễn Huy Hoàng</strong></h1>
-				<p class="subtitle">Sinh viên ngành Công nghệ Thông tin - Trường Đại học Tây Nguyên.</p>
+				<h1>Xin chào, mình là <strong><?php echo esc_html( $owner_name ); ?></strong></h1>
+				<p class="subtitle"><?php echo esc_html( $profile_subtitle ); ?></p>
 				<p>Mục tiêu nghề nghiệp: trở thành <strong>Backend Developer</strong>, xây dựng hệ thống web ổn định, dễ mở rộng.</p>
 				<div class="badge-row">
 					<span class="badge"><i class="fa-solid fa-laptop-code"></i> CNTT</span>
@@ -27,7 +37,7 @@ get_header();
 			</div>
 			<div class="home-v2-avatar-wrap">
 				<div class="profile-shape"></div>
-				<img class="profile-photo" src="<?php echo esc_url( get_template_directory_uri() . '/assets/images/avt.png' ); ?>" alt="Ảnh cá nhân Nguyễn Huy Hoàng">
+				<img class="profile-photo" src="<?php echo esc_url( get_template_directory_uri() . '/assets/images/avt.png' ); ?>" alt="Ảnh cá nhân <?php echo esc_attr( $owner_name ); ?>">
 			</div>
 		</div>
 

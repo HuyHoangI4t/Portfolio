@@ -4,50 +4,72 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-// Gmail SMTP Configuration
-function huyhoang_configure_gmail_smtp( $phpmailer ) {
-	// Gmail account credentials - UPDATE THESE
-	$phpmailer->isSMTP();
-	$phpmailer->Host       = 'smtp.gmail.com';
-	$phpmailer->SMTPAuth   = true;
-	$phpmailer->Port       = 587;
-	$phpmailer->SMTPSecure = 'tls';
-	
-	// Your Gmail address
-	$phpmailer->Username = 'huyhoangpro187@gmail.com';
-	
-	// Gmail App Password (generate at myaccount.google.com/apppasswords)
-	// This is NOT your Gmail password - generate an app-specific password
-	$phpmailer->Password = 'hbaw vshj yclf zgfe'; // Replace with your App Password
-	
-	// Set from name and address
-	$phpmailer->From     = 'huyhoangpro187@gmail.com';
-	$phpmailer->FromName = 'HuyHoang Portfolio';
-}
-add_action( 'phpmailer_init', 'huyhoang_configure_gmail_smtp' );
+function portfolio_get_config_value( $key, $default = '' ) {
+	if ( defined( $key ) ) {
+		$value = constant( $key );
+		if ( '' !== (string) $value ) {
+			return (string) $value;
+		}
+	}
 
-function huyhoang_theme_setup() {
+	$env = getenv( $key );
+
+	if ( false !== $env && '' !== (string) $env ) {
+		return (string) $env;
+	}
+
+	return (string) $default;
+}
+
+// Optional SMTP fallback (recommended: use WP Mail SMTP plugin).
+function portfolio_configure_optional_smtp( $phpmailer ) {
+	$smtp_user = portfolio_get_config_value( 'PORTFOLIO_SMTP_USER' );
+	$smtp_pass = portfolio_get_config_value( 'PORTFOLIO_SMTP_PASS' );
+
+	if ( '' === $smtp_user || '' === $smtp_pass ) {
+		return;
+	}
+
+	$smtp_host   = portfolio_get_config_value( 'PORTFOLIO_SMTP_HOST', 'smtp.gmail.com' );
+	$smtp_port   = (int) portfolio_get_config_value( 'PORTFOLIO_SMTP_PORT', '587' );
+	$smtp_secure = portfolio_get_config_value( 'PORTFOLIO_SMTP_SECURE', 'tls' );
+	$smtp_from   = portfolio_get_config_value( 'PORTFOLIO_SMTP_FROM', $smtp_user );
+	$smtp_name   = portfolio_get_config_value( 'PORTFOLIO_SMTP_FROM_NAME', 'Portfolio' );
+
+	$phpmailer->isSMTP();
+	$phpmailer->Host       = $smtp_host;
+	$phpmailer->SMTPAuth   = true;
+	$phpmailer->Port       = $smtp_port > 0 ? $smtp_port : 587;
+	$phpmailer->SMTPSecure = $smtp_secure;
+	$phpmailer->Username   = $smtp_user;
+	$phpmailer->Password   = $smtp_pass;
+	$phpmailer->From       = $smtp_from;
+	$phpmailer->FromName   = $smtp_name;
+}
+add_action( 'phpmailer_init', 'portfolio_configure_optional_smtp' );
+
+function portfolio_theme_setup() {
 	add_theme_support( 'title-tag' );
 	add_theme_support( 'post-thumbnails' );
 }
-add_action( 'after_setup_theme', 'huyhoang_theme_setup' );
+add_action( 'after_setup_theme', 'portfolio_theme_setup' );
 
-function huyhoang_enqueue_assets() {
+function portfolio_enqueue_assets() {
 	$style_path = get_stylesheet_directory() . '/style.css';
 	$version    = file_exists( $style_path ) ? (string) filemtime( $style_path ) : '1.0.0';
 
 	wp_enqueue_style(
-		'huyhoang-fontawesome',
+		'portfolio-fontawesome',
 		'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css',
 		array(),
 		'6.0.0'
 	);
 
-	wp_enqueue_style( 'huyhoang-style', get_stylesheet_uri(), array(), $version );
+	wp_enqueue_style( 'portfolio-style', get_stylesheet_uri(), array(), $version );
 }
-add_action( 'wp_enqueue_scripts', 'huyhoang_enqueue_assets' );
+add_action( 'wp_enqueue_scripts', 'portfolio_enqueue_assets' );
 
-function huyhoang_get_contact_page_url() {
+function portfolio_get_contact_page_url() {
 	$contact_page = get_page_by_path( 'contact' );
 
 	if ( $contact_page instanceof WP_Post ) {
@@ -57,16 +79,16 @@ function huyhoang_get_contact_page_url() {
 	return home_url( '/contact/' );
 }
 
-function huyhoang_handle_contact_form() {
-	if ( ! isset( $_POST['huyhoang_contact_nonce'] ) ) {
-		wp_safe_redirect( add_query_arg( 'contact_status', 'invalid_nonce', huyhoang_get_contact_page_url() ) );
+function portfolio_handle_contact_form() {
+	if ( ! isset( $_POST['portfolio_contact_nonce'] ) ) {
+		wp_safe_redirect( add_query_arg( 'contact_status', 'invalid_nonce', portfolio_get_contact_page_url() ) );
 		exit;
 	}
 
-	$nonce = sanitize_text_field( wp_unslash( $_POST['huyhoang_contact_nonce'] ) );
+	$nonce = sanitize_text_field( wp_unslash( $_POST['portfolio_contact_nonce'] ) );
 
-	if ( ! wp_verify_nonce( $nonce, 'huyhoang_contact_send' ) ) {
-		wp_safe_redirect( add_query_arg( 'contact_status', 'invalid_nonce', huyhoang_get_contact_page_url() ) );
+	if ( ! wp_verify_nonce( $nonce, 'portfolio_contact_send' ) ) {
+		wp_safe_redirect( add_query_arg( 'contact_status', 'invalid_nonce', portfolio_get_contact_page_url() ) );
 		exit;
 	}
 
@@ -76,16 +98,16 @@ function huyhoang_handle_contact_form() {
 	$message = isset( $_POST['message'] ) ? sanitize_textarea_field( wp_unslash( $_POST['message'] ) ) : '';
 
 	if ( '' === $name || '' === $email || '' === $subject || '' === $message ) {
-		wp_safe_redirect( add_query_arg( 'contact_status', 'required', huyhoang_get_contact_page_url() ) );
+		wp_safe_redirect( add_query_arg( 'contact_status', 'required', portfolio_get_contact_page_url() ) );
 		exit;
 	}
 
 	if ( ! is_email( $email ) ) {
-		wp_safe_redirect( add_query_arg( 'contact_status', 'invalid_email', huyhoang_get_contact_page_url() ) );
+		wp_safe_redirect( add_query_arg( 'contact_status', 'invalid_email', portfolio_get_contact_page_url() ) );
 		exit;
 	}
 
-	$to      = 'huyhoangpro187@gmail.com';
+	$to      = portfolio_get_config_value( 'PORTFOLIO_CONTACT_TO', get_option( 'admin_email' ) );
 	$subject = '[Portfolio Contact] ' . $subject;
 	$body    = "Họ tên: {$name}\n";
 	$body   .= "Email: {$email}\n\n";
@@ -100,13 +122,13 @@ function huyhoang_handle_contact_form() {
 
 	$status = $sent ? 'success' : 'failed';
 
-	wp_safe_redirect( add_query_arg( 'contact_status', $status, huyhoang_get_contact_page_url() ) );
+	wp_safe_redirect( add_query_arg( 'contact_status', $status, portfolio_get_contact_page_url() ) );
 	exit;
 }
-add_action( 'admin_post_nopriv_huyhoang_contact_send', 'huyhoang_handle_contact_form' );
-add_action( 'admin_post_huyhoang_contact_send', 'huyhoang_handle_contact_form' );
+add_action( 'admin_post_nopriv_portfolio_contact_send', 'portfolio_handle_contact_form' );
+add_action( 'admin_post_portfolio_contact_send', 'portfolio_handle_contact_form' );
 
-function huyhoang_nav_items() {
+function portfolio_nav_items() {
 	$home_url = home_url( '/' );
 
 	$resume_page   = get_page_by_path( 'resume' );
@@ -125,12 +147,12 @@ function huyhoang_nav_items() {
 	);
 }
 
-function huyhoang_portfolio_seed_projects() {
+function portfolio_seed_projects() {
 	return array(
 		array(
 			'title'       => 'SmartSpending',
 			'description' => 'Ứng dụng quản lý chi tiêu cá nhân giúp theo dõi thu/chi, lập ngân sách và xem thống kê tài chính rõ ràng.',
-			'github'      => 'https://github.com/HuyHoangI4t/Quan_Ly_Chi_Tieu',
+			'github'      => 'https://github.com/your-username/smartspending',
 			'media'       => array(
 				array(
 					'type' => 'image',
@@ -152,7 +174,7 @@ function huyhoang_portfolio_seed_projects() {
 		array(
 			'title'       => 'Bomber-man',
 			'description' => 'Dự án game Bomber-man với gameplay đặt bom, vượt chướng ngại vật và tính điểm.',
-			'github'      => 'https://github.com/HuyHoangI4t/Bomber-man',
+			'github'      => 'https://github.com/your-username/bomber-man',
 			'media'       => array(
 				array(
 					'type' => 'video',
@@ -174,7 +196,7 @@ function huyhoang_portfolio_seed_projects() {
 		array(
 			'title'       => 'Chatbot TNU Assistant',
 			'description' => 'Chatbot hỗ trợ sinh viên với giao diện trò chuyện thân thiện, hỗ trợ trả lời nhanh các câu hỏi thường gặp.',
-			'github'      => 'https://github.com/HuyHoangI4t/WEB-CB',
+			'github'      => 'https://github.com/your-username/chatbot-web',
 			'media'       => array(
 				array(
 					'type' => 'image',
@@ -197,7 +219,7 @@ function huyhoang_portfolio_seed_projects() {
 }
 
 
-function huyhoang_sync_seeded_portfolio_projects() {
+function portfolio_sync_seeded_projects() {
 	$projects = get_posts(
 		array(
 			'post_type'      => 'portfolio_project',
@@ -208,7 +230,7 @@ function huyhoang_sync_seeded_portfolio_projects() {
 		)
 	);
 
-	$seed_projects = huyhoang_portfolio_seed_projects();
+	$seed_projects = portfolio_seed_projects();
 
 	foreach ( $projects as $index => $project ) {
 		if ( ! isset( $seed_projects[ $index ] ) ) {
@@ -229,7 +251,7 @@ function huyhoang_sync_seeded_portfolio_projects() {
 		);
 
 		if ( isset( $target['github'] ) ) {
-			update_post_meta( $project->ID, '_huyhoang_project_github', esc_url_raw( $target['github'] ) );
+			update_post_meta( $project->ID, '_portfolio_project_github', esc_url_raw( $target['github'] ) );
 		}
 
 		for ( $slot = 1; $slot <= 3; $slot++ ) {
@@ -238,14 +260,14 @@ function huyhoang_sync_seeded_portfolio_projects() {
 			$src   = isset( $media['src'] ) ? esc_url_raw( $media['src'] ) : '';
 			$alt   = isset( $media['alt'] ) ? sanitize_text_field( $media['alt'] ) : '';
 
-			update_post_meta( $project->ID, "_huyhoang_media_{$slot}_type", $type );
-			update_post_meta( $project->ID, "_huyhoang_media_{$slot}_src", $src );
-			update_post_meta( $project->ID, "_huyhoang_media_{$slot}_alt", $alt );
+			update_post_meta( $project->ID, "_portfolio_media_{$slot}_type", $type );
+			update_post_meta( $project->ID, "_portfolio_media_{$slot}_src", $src );
+			update_post_meta( $project->ID, "_portfolio_media_{$slot}_alt", $alt );
 		}
 	}
 }
-add_action( 'init', 'huyhoang_sync_seeded_portfolio_projects', 25 );
-function huyhoang_register_portfolio_project_cpt() {
+add_action( 'init', 'portfolio_sync_seeded_projects', 25 );
+function portfolio_register_project_cpt() {
 	register_post_type(
 		'portfolio_project',
 		array(
@@ -265,61 +287,61 @@ function huyhoang_register_portfolio_project_cpt() {
 		)
 	);
 }
-add_action( 'init', 'huyhoang_register_portfolio_project_cpt' );
+add_action( 'init', 'portfolio_register_project_cpt' );
 
-function huyhoang_render_portfolio_project_meta_box( $post ) {
-	wp_nonce_field( 'huyhoang_portfolio_project_save', 'huyhoang_portfolio_project_nonce' );
-	$github = get_post_meta( $post->ID, '_huyhoang_project_github', true );
+function portfolio_render_project_meta_box( $post ) {
+	wp_nonce_field( 'portfolio_project_save', 'portfolio_project_nonce' );
+	$github = get_post_meta( $post->ID, '_portfolio_project_github', true );
 	?>
 	<p>
-		<label for="huyhoang_project_github"><strong>Link GitHub</strong></label>
-		<input type="url" id="huyhoang_project_github" name="huyhoang_project_github" value="<?php echo esc_attr( $github ); ?>" style="width:100%;">
+		<label for="portfolio_project_github"><strong>Link GitHub</strong></label>
+		<input type="url" id="portfolio_project_github" name="portfolio_project_github" value="<?php echo esc_attr( $github ); ?>" style="width:100%;">
 	</p>
 	<?php for ( $i = 1; $i <= 3; $i++ ) : ?>
 		<?php
-		$type = get_post_meta( $post->ID, "_huyhoang_media_{$i}_type", true );
-		$src  = get_post_meta( $post->ID, "_huyhoang_media_{$i}_src", true );
-		$alt  = get_post_meta( $post->ID, "_huyhoang_media_{$i}_alt", true );
+		$type = get_post_meta( $post->ID, "_portfolio_media_{$i}_type", true );
+		$src  = get_post_meta( $post->ID, "_portfolio_media_{$i}_src", true );
+		$alt  = get_post_meta( $post->ID, "_portfolio_media_{$i}_alt", true );
 		?>
 		<hr>
 		<p><strong>Media <?php echo esc_html( $i ); ?></strong></p>
 		<p>
 			<label>Loại</label>
-			<select name="huyhoang_media_<?php echo esc_attr( $i ); ?>_type" style="width:100%;">
+			<select name="portfolio_media_<?php echo esc_attr( $i ); ?>_type" style="width:100%;">
 				<option value="image" <?php selected( $type, 'image' ); ?>>Ảnh</option>
 				<option value="video" <?php selected( $type, 'video' ); ?>>Video</option>
 			</select>
 		</p>
 		<p>
 			<label>Đường dẫn ảnh/video</label>
-			<input type="text" name="huyhoang_media_<?php echo esc_attr( $i ); ?>_src" value="<?php echo esc_attr( $src ); ?>" style="width:100%;">
+			<input type="text" name="portfolio_media_<?php echo esc_attr( $i ); ?>_src" value="<?php echo esc_attr( $src ); ?>" style="width:100%;">
 		</p>
 		<p>
 			<label>Mô tả alt</label>
-			<input type="text" name="huyhoang_media_<?php echo esc_attr( $i ); ?>_alt" value="<?php echo esc_attr( $alt ); ?>" style="width:100%;">
+			<input type="text" name="portfolio_media_<?php echo esc_attr( $i ); ?>_alt" value="<?php echo esc_attr( $alt ); ?>" style="width:100%;">
 		</p>
 	<?php endfor; ?>
 	<?php
 }
 
-function huyhoang_add_portfolio_project_meta_boxes() {
+function portfolio_add_project_meta_boxes() {
 	add_meta_box(
-		'huyhoang_portfolio_project_meta_box',
+		'portfolio_project_meta_box',
 		'Thông tin dự án',
-		'huyhoang_render_portfolio_project_meta_box',
+		'portfolio_render_project_meta_box',
 		'portfolio_project',
 		'normal',
 		'high'
 	);
 }
-add_action( 'add_meta_boxes', 'huyhoang_add_portfolio_project_meta_boxes' );
+add_action( 'add_meta_boxes', 'portfolio_add_project_meta_boxes' );
 
-function huyhoang_save_portfolio_project_meta( $post_id ) {
-	if ( ! isset( $_POST['huyhoang_portfolio_project_nonce'] ) ) {
+function portfolio_save_project_meta( $post_id ) {
+	if ( ! isset( $_POST['portfolio_project_nonce'] ) ) {
 		return;
 	}
 
-	if ( ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['huyhoang_portfolio_project_nonce'] ) ), 'huyhoang_portfolio_project_save' ) ) {
+	if ( ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['portfolio_project_nonce'] ) ), 'portfolio_project_save' ) ) {
 		return;
 	}
 
@@ -331,27 +353,27 @@ function huyhoang_save_portfolio_project_meta( $post_id ) {
 		return;
 	}
 
-	$github = isset( $_POST['huyhoang_project_github'] ) ? esc_url_raw( wp_unslash( $_POST['huyhoang_project_github'] ) ) : '';
-	update_post_meta( $post_id, '_huyhoang_project_github', $github );
+	$github = isset( $_POST['portfolio_project_github'] ) ? esc_url_raw( wp_unslash( $_POST['portfolio_project_github'] ) ) : '';
+	update_post_meta( $post_id, '_portfolio_project_github', $github );
 
 	for ( $i = 1; $i <= 3; $i++ ) {
-		$type_key = "huyhoang_media_{$i}_type";
-		$src_key  = "huyhoang_media_{$i}_src";
-		$alt_key  = "huyhoang_media_{$i}_alt";
+		$type_key = "portfolio_media_{$i}_type";
+		$src_key  = "portfolio_media_{$i}_src";
+		$alt_key  = "portfolio_media_{$i}_alt";
 
 		$type = isset( $_POST[ $type_key ] ) && 'video' === wp_unslash( $_POST[ $type_key ] ) ? 'video' : 'image';
 		$src  = isset( $_POST[ $src_key ] ) ? esc_url_raw( wp_unslash( $_POST[ $src_key ] ) ) : '';
 		$alt  = isset( $_POST[ $alt_key ] ) ? sanitize_text_field( wp_unslash( $_POST[ $alt_key ] ) ) : '';
 
-		update_post_meta( $post_id, "_huyhoang_media_{$i}_type", $type );
-		update_post_meta( $post_id, "_huyhoang_media_{$i}_src", $src );
-		update_post_meta( $post_id, "_huyhoang_media_{$i}_alt", $alt );
+		update_post_meta( $post_id, "_portfolio_media_{$i}_type", $type );
+		update_post_meta( $post_id, "_portfolio_media_{$i}_src", $src );
+		update_post_meta( $post_id, "_portfolio_media_{$i}_alt", $alt );
 	}
 }
-add_action( 'save_post_portfolio_project', 'huyhoang_save_portfolio_project_meta' );
+add_action( 'save_post_portfolio_project', 'portfolio_save_project_meta' );
 
-function huyhoang_seed_portfolio_projects_to_db() {
-	if ( get_option( 'huyhoang_portfolio_projects_seeded' ) ) {
+function portfolio_seed_projects_to_db() {
+	if ( get_option( 'portfolio_projects_seeded' ) ) {
 		return;
 	}
 
@@ -365,11 +387,11 @@ function huyhoang_seed_portfolio_projects_to_db() {
 	);
 
 	if ( ! empty( $existing ) ) {
-		update_option( 'huyhoang_portfolio_projects_seeded', 1 );
+		update_option( 'portfolio_projects_seeded', 1 );
 		return;
 	}
 
-	foreach ( huyhoang_portfolio_seed_projects() as $index => $project ) {
+	foreach ( portfolio_seed_projects() as $index => $project ) {
 		$post_id = wp_insert_post(
 			array(
 				'post_type'    => 'portfolio_project',
@@ -386,21 +408,21 @@ function huyhoang_seed_portfolio_projects_to_db() {
 			continue;
 		}
 
-		update_post_meta( $post_id, '_huyhoang_project_github', $project['github'] );
+		update_post_meta( $post_id, '_portfolio_project_github', $project['github'] );
 
 		foreach ( $project['media'] as $media_index => $media ) {
 			$slot = $media_index + 1;
-			update_post_meta( $post_id, "_huyhoang_media_{$slot}_type", $media['type'] );
-			update_post_meta( $post_id, "_huyhoang_media_{$slot}_src", $media['src'] );
-			update_post_meta( $post_id, "_huyhoang_media_{$slot}_alt", $media['alt'] );
+			update_post_meta( $post_id, "_portfolio_media_{$slot}_type", $media['type'] );
+			update_post_meta( $post_id, "_portfolio_media_{$slot}_src", $media['src'] );
+			update_post_meta( $post_id, "_portfolio_media_{$slot}_alt", $media['alt'] );
 		}
 	}
 
-	update_option( 'huyhoang_portfolio_projects_seeded', 1 );
+	update_option( 'portfolio_projects_seeded', 1 );
 }
-add_action( 'init', 'huyhoang_seed_portfolio_projects_to_db', 20 );
+add_action( 'init', 'portfolio_seed_projects_to_db', 20 );
 
-function huyhoang_get_or_create_page( $title, $slug ) {
+function portfolio_get_or_create_page( $title, $slug ) {
 	$page = get_page_by_path( $slug );
 
 	if ( $page instanceof WP_Post ) {
@@ -425,11 +447,11 @@ function huyhoang_get_or_create_page( $title, $slug ) {
 	return (int) $page_id;
 }
 
-function huyhoang_ensure_required_pages() {
-	$home_id     = huyhoang_get_or_create_page( 'Home', 'home' );
-	$resume_id   = huyhoang_get_or_create_page( 'Resume', 'resume' );
-	$projects_id = huyhoang_get_or_create_page( 'Projects', 'projects' );
-	$contact_id  = huyhoang_get_or_create_page( 'Contact', 'contact' );
+function portfolio_ensure_required_pages() {
+	$home_id     = portfolio_get_or_create_page( 'Home', 'home' );
+	$resume_id   = portfolio_get_or_create_page( 'Resume', 'resume' );
+	$projects_id = portfolio_get_or_create_page( 'Projects', 'projects' );
+	$contact_id  = portfolio_get_or_create_page( 'Contact', 'contact' );
 
 	if ( $home_id ) {
 		update_option( 'show_on_front', 'page' );
@@ -437,7 +459,7 @@ function huyhoang_ensure_required_pages() {
 	}
 
 	if ( $home_id && $resume_id && $projects_id && $contact_id ) {
-		update_option( 'huyhoang_required_pages_created', 1 );
+		update_option( 'portfolio_required_pages_created', 1 );
 	}
 }
-add_action( 'init', 'huyhoang_ensure_required_pages' );
+add_action( 'init', 'portfolio_ensure_required_pages' );

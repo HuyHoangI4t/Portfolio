@@ -3,7 +3,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-function huyhoang_normalize_project_media_src( $src ) {
+function portfolio_normalize_project_media_src( $src ) {
 	if ( empty( $src ) ) {
 		return '';
 	}
@@ -18,7 +18,7 @@ function huyhoang_normalize_project_media_src( $src ) {
 	return $src;
 }
 
-function huyhoang_get_project_display_description( $project_id ) {
+function portfolio_get_project_display_description( $project_id ) {
 	$description = get_the_excerpt( $project_id );
 
 	if ( empty( trim( (string) $description ) ) ) {
@@ -67,18 +67,18 @@ $project_query = new WP_Query(
 						<?php while ( $project_query->have_posts() ) : $project_query->the_post(); ?>
 							<?php
 							$project_id = get_the_ID();
-							$github     = get_post_meta( $project_id, '_huyhoang_project_github', true );
+							$github     = get_post_meta( $project_id, '_portfolio_project_github', true );
 							$media      = array();
 
 							for ( $i = 1; $i <= 3; $i++ ) {
-								$type = get_post_meta( $project_id, "_huyhoang_media_{$i}_type", true );
-								$src  = get_post_meta( $project_id, "_huyhoang_media_{$i}_src", true );
-								$alt  = get_post_meta( $project_id, "_huyhoang_media_{$i}_alt", true );
+								$type = get_post_meta( $project_id, "_portfolio_media_{$i}_type", true );
+								$src  = get_post_meta( $project_id, "_portfolio_media_{$i}_src", true );
+								$alt  = get_post_meta( $project_id, "_portfolio_media_{$i}_alt", true );
 
 								if ( ! empty( $src ) ) {
 									$media[] = array(
 										'type' => $type ? $type : 'image',
-										'src'  => huyhoang_normalize_project_media_src( $src ),
+										'src'  => portfolio_normalize_project_media_src( $src ),
 										'alt'  => $alt ? $alt : get_the_title(),
 									);
 								}
@@ -119,7 +119,7 @@ $project_query = new WP_Query(
 									</div>
 								</div>
 								<h3><?php the_title(); ?></h3>
-								<p class="meta"><?php echo esc_html( huyhoang_get_project_display_description( $project_id ) ); ?></p>
+								<p class="meta"><?php echo esc_html( portfolio_get_project_display_description( $project_id ) ); ?></p>
 								<p><a class="btn" href="<?php echo esc_url( $github ); ?>" target="_blank" rel="noopener noreferrer">Xem GitHub</a></p>
 							</article>
 						<?php endwhile; ?>

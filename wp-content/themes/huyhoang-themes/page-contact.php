@@ -6,6 +6,22 @@ if ( ! defined( 'ABSPATH' ) ) {
 $contact_status = isset( $_GET['contact_status'] ) ? sanitize_key( wp_unslash( $_GET['contact_status'] ) ) : '';
 $form_action    = esc_url( admin_url( 'admin-post.php' ) );
 
+$get_config = function_exists( 'portfolio_get_config_value' )
+	? 'portfolio_get_config_value'
+	: static function( $key, $default = '' ) {
+		$env = getenv( $key );
+		return false !== $env && '' !== (string) $env ? (string) $env : (string) $default;
+	};
+
+$public_email    = $get_config( 'PORTFOLIO_PUBLIC_EMAIL', 'your-email@example.com' );
+$public_phone    = $get_config( 'PORTFOLIO_PUBLIC_PHONE', '0000000000' );
+$public_address  = $get_config( 'PORTFOLIO_PUBLIC_ADDRESS', 'Your Address' );
+$public_github   = $get_config( 'PORTFOLIO_PUBLIC_GITHUB', 'https://github.com/your-username' );
+$public_facebook = $get_config( 'PORTFOLIO_PUBLIC_FACEBOOK', 'https://facebook.com/your-profile' );
+$map_embed       = $get_config( 'PORTFOLIO_PUBLIC_MAP_EMBED', 'https://www.google.com/maps' );
+
+$public_phone_href = preg_replace( '/[^0-9+]/', '', $public_phone );
+
 get_header();
 ?>
 <section class="page-section contact-page">
@@ -19,21 +35,21 @@ get_header();
 				<h3>Thông tin liên hệ</h3>
 				<ul class="contact-items">
 					<li><span>✉️</span>
-						<div><strong>Email</strong><a href="mailto:huyhoangpro187@gmail.com">huyhoangpro187@gmail.com</a></div>
+						<div><strong>Email</strong><a href="mailto:<?php echo esc_attr( $public_email ); ?>"><?php echo esc_html( $public_email ); ?></a></div>
 					</li>
 					<li><span>📞</span>
-						<div><strong>SĐT</strong><a href="tel:0329106783">0329106783</a></div>
+						<div><strong>SĐT</strong><a href="tel:<?php echo esc_attr( $public_phone_href ); ?>"><?php echo esc_html( $public_phone ); ?></a></div>
 					</li>
 					<li><span>📍</span>
 						<div><strong>Địa chỉ</strong>
-							<p>Ea Drông, Buôn Hồ, Đăk Lăk</p>
+							<p><?php echo esc_html( $public_address ); ?></p>
 						</div>
 					</li>
 					<li><span>💻</span>
-						<div><strong>GitHub</strong><a href="https://github.com/HuyHoangI4t" target="_blank" rel="noopener noreferrer">github.com/HuyHoangI4t</a></div>
+						<div><strong>GitHub</strong><a href="<?php echo esc_url( $public_github ); ?>" target="_blank" rel="noopener noreferrer"><?php echo esc_html( preg_replace( '#^https?://#', '', $public_github ) ); ?></a></div>
 					</li>
 					<li><span>📘</span>
-						<div><strong>Facebook</strong><a href="https://www.facebook.com/hamm67" target="_blank" rel="noopener noreferrer">facebook.com/hamm67</a></div>
+						<div><strong>Facebook</strong><a href="<?php echo esc_url( $public_facebook ); ?>" target="_blank" rel="noopener noreferrer"><?php echo esc_html( preg_replace( '#^https?://#', '', $public_facebook ) ); ?></a></div>
 					</li>
 				</ul>
 				<div class="contact-mini-note">Thường phản hồi trong vòng 24 giờ.</div>
@@ -53,8 +69,8 @@ get_header();
 				<?php endif; ?>
 
 				<form action="<?php echo esc_url( $form_action ); ?>" method="post">
-					<input type="hidden" name="action" value="huyhoang_contact_send">
-					<?php wp_nonce_field( 'huyhoang_contact_send', 'huyhoang_contact_nonce' ); ?>
+					<input type="hidden" name="action" value="portfolio_contact_send">
+					<?php wp_nonce_field( 'portfolio_contact_send', 'portfolio_contact_nonce' ); ?>
 					<div class="form-group">
 						<label for="contact-name">Họ và tên</label>
 						<input type="text" name="name" id="contact-name" required>
@@ -79,7 +95,7 @@ get_header();
 		<div class="card contact-map">
 			<h3>Google Maps địa chỉ nhà</h3>
 			<iframe
-				src="https://www.google.com/maps/embed?pb=!1m17!1m12!1m3!1d3697.5167898903346!2d108.35750707483912!3d12.843904987459899!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m2!1m1!2zMTLCsDUwJzM4LjEiTiAxMDjCsDIxJzM2LjMiRQ!5e1!3m2!1svi!2s!4v1775367785588!5m2!1svi!2s"
+				src="<?php echo esc_url( $map_embed ); ?>"
 				width="100%"
 				height="450"
 				style="border:0;"
