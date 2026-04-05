@@ -86,7 +86,8 @@ $project_query = new WP_Query(
 
 							$main_media      = isset( $media[0] ) ? $media[0] : null;
 							$secondary_media = array_slice( $media, 1, 2 );
-							$card_class      = ( $project_index % 2 === 1 ) ? ' project-card--reverse' : '';
+							$should_reverse  = ( $project_index % 2 === 1 ) && ! ( $main_media && 'video' === $main_media['type'] );
+							$card_class      = $should_reverse ? ' project-card--reverse' : '';
 							$project_index++;
 							?>
 							<article class="card project-card<?php echo esc_attr( $card_class ); ?>">

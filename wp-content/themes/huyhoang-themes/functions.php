@@ -4,6 +4,28 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+// Gmail SMTP Configuration
+function huyhoang_configure_gmail_smtp( $phpmailer ) {
+	// Gmail account credentials - UPDATE THESE
+	$phpmailer->isSMTP();
+	$phpmailer->Host       = 'smtp.gmail.com';
+	$phpmailer->SMTPAuth   = true;
+	$phpmailer->Port       = 587;
+	$phpmailer->SMTPSecure = 'tls';
+	
+	// Your Gmail address
+	$phpmailer->Username = 'huyhoangpro187@gmail.com';
+	
+	// Gmail App Password (generate at myaccount.google.com/apppasswords)
+	// This is NOT your Gmail password - generate an app-specific password
+	$phpmailer->Password = 'hbaw vshj yclf zgfe'; // Replace with your App Password
+	
+	// Set from name and address
+	$phpmailer->From     = 'huyhoangpro187@gmail.com';
+	$phpmailer->FromName = 'HuyHoang Portfolio';
+}
+add_action( 'phpmailer_init', 'huyhoang_configure_gmail_smtp' );
+
 function huyhoang_theme_setup() {
 	add_theme_support( 'title-tag' );
 	add_theme_support( 'post-thumbnails' );
@@ -139,12 +161,12 @@ function huyhoang_portfolio_seed_projects() {
 				),
 				array(
 					'type' => 'image',
-					'src'  => get_template_directory_uri() . '/assets/images/db1.png',
+					'src'  => get_template_directory_uri() . '/assets/images/Db1.png',
 					'alt'  => 'Bomber-man - hình 1',
 				),
 				array(
 					'type' => 'image',
-					'src'  => get_template_directory_uri() . '/assets/images/db2.png',
+					'src'  => get_template_directory_uri() . '/assets/images/Db2.png',
 					'alt'  => 'Bomber-man - hình 2',
 				),
 			),
@@ -205,6 +227,21 @@ function huyhoang_sync_seeded_portfolio_projects() {
 		wp_update_post(
 			$post_data
 		);
+
+		if ( isset( $target['github'] ) ) {
+			update_post_meta( $project->ID, '_huyhoang_project_github', esc_url_raw( $target['github'] ) );
+		}
+
+		for ( $slot = 1; $slot <= 3; $slot++ ) {
+			$media = isset( $target['media'][ $slot - 1 ] ) ? $target['media'][ $slot - 1 ] : array();
+			$type  = ( isset( $media['type'] ) && 'video' === $media['type'] ) ? 'video' : 'image';
+			$src   = isset( $media['src'] ) ? esc_url_raw( $media['src'] ) : '';
+			$alt   = isset( $media['alt'] ) ? sanitize_text_field( $media['alt'] ) : '';
+
+			update_post_meta( $project->ID, "_huyhoang_media_{$slot}_type", $type );
+			update_post_meta( $project->ID, "_huyhoang_media_{$slot}_src", $src );
+			update_post_meta( $project->ID, "_huyhoang_media_{$slot}_alt", $alt );
+		}
 	}
 }
 add_action( 'init', 'huyhoang_sync_seeded_portfolio_projects', 25 );
