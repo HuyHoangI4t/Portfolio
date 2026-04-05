@@ -14,24 +14,100 @@ function huyhoang_enqueue_assets() {
 	$style_path = get_stylesheet_directory() . '/style.css';
 	$version    = file_exists( $style_path ) ? (string) filemtime( $style_path ) : '1.0.0';
 
+	wp_enqueue_style(
+		'huyhoang-fontawesome',
+		'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css',
+		array(),
+		'6.0.0'
+	);
+
 	wp_enqueue_style( 'huyhoang-style', get_stylesheet_uri(), array(), $version );
 }
 add_action( 'wp_enqueue_scripts', 'huyhoang_enqueue_assets' );
 
+function huyhoang_get_contact_page_url() {
+	$contact_page = get_page_by_path( 'contact' );
+
+	if ( $contact_page instanceof WP_Post ) {
+		return get_permalink( $contact_page );
+	}
+
+	return home_url( '/contact/' );
+}
+
+function huyhoang_handle_contact_form() {
+	if ( ! isset( $_POST['huyhoang_contact_nonce'] ) ) {
+		wp_safe_redirect( add_query_arg( 'contact_status', 'invalid_nonce', huyhoang_get_contact_page_url() ) );
+		exit;
+	}
+
+	$nonce = sanitize_text_field( wp_unslash( $_POST['huyhoang_contact_nonce'] ) );
+
+	if ( ! wp_verify_nonce( $nonce, 'huyhoang_contact_send' ) ) {
+		wp_safe_redirect( add_query_arg( 'contact_status', 'invalid_nonce', huyhoang_get_contact_page_url() ) );
+		exit;
+	}
+
+	$name    = isset( $_POST['name'] ) ? sanitize_text_field( wp_unslash( $_POST['name'] ) ) : '';
+	$email   = isset( $_POST['email'] ) ? sanitize_email( wp_unslash( $_POST['email'] ) ) : '';
+	$subject  = isset( $_POST['subject'] ) ? sanitize_text_field( wp_unslash( $_POST['subject'] ) ) : '';
+	$message = isset( $_POST['message'] ) ? sanitize_textarea_field( wp_unslash( $_POST['message'] ) ) : '';
+
+	if ( '' === $name || '' === $email || '' === $subject || '' === $message ) {
+		wp_safe_redirect( add_query_arg( 'contact_status', 'required', huyhoang_get_contact_page_url() ) );
+		exit;
+	}
+
+	if ( ! is_email( $email ) ) {
+		wp_safe_redirect( add_query_arg( 'contact_status', 'invalid_email', huyhoang_get_contact_page_url() ) );
+		exit;
+	}
+
+	$to      = 'huyhoangpro187@gmail.com';
+	$subject = '[Portfolio Contact] ' . $subject;
+	$body    = "Họ tên: {$name}\n";
+	$body   .= "Email: {$email}\n\n";
+	$body   .= "Nội dung:\n{$message}\n";
+
+	$headers = array(
+		'Content-Type: text/plain; charset=UTF-8',
+		'Reply-To: ' . $email,
+	);
+
+	$sent = wp_mail( $to, $subject, $body, $headers );
+
+	$status = $sent ? 'success' : 'failed';
+
+	wp_safe_redirect( add_query_arg( 'contact_status', $status, huyhoang_get_contact_page_url() ) );
+	exit;
+}
+add_action( 'admin_post_nopriv_huyhoang_contact_send', 'huyhoang_handle_contact_form' );
+add_action( 'admin_post_huyhoang_contact_send', 'huyhoang_handle_contact_form' );
+
 function huyhoang_nav_items() {
+	$home_url = home_url( '/' );
+
+	$resume_page   = get_page_by_path( 'resume' );
+	$projects_page = get_page_by_path( 'projects' );
+	$contact_page  = get_page_by_path( 'contact' );
+
+	$resume_url = $resume_page instanceof WP_Post ? get_permalink( $resume_page ) : home_url( '/resume/' );
+	$projects_url = $projects_page instanceof WP_Post ? get_permalink( $projects_page ) : home_url( '/projects/' );
+	$contact_url = $contact_page instanceof WP_Post ? get_permalink( $contact_page ) : home_url( '/contact/' );
+
 	return array(
-		home_url( '/' )            => 'Trang chủ',
-		home_url( '/resume/' )     => 'Kỹ năng & Học vấn',
-		home_url( '/projects/' )   => 'Dự án',
-		home_url( '/contact/' )    => 'Liên hệ',
+		$home_url     => 'Trang chủ',
+		$resume_url   => 'Kỹ năng & Học vấn',
+		$projects_url => 'Dự án',
+		$contact_url  => 'Liên hệ',
 	);
 }
 
 function huyhoang_portfolio_seed_projects() {
 	return array(
 		array(
-			'title'       => 'Quản Lý Chi Tiêu',
-			'description' => 'Ứng dụng hỗ trợ quản lý chi tiêu cá nhân, theo dõi thu/chi và thống kê tài chính.',
+			'title'       => 'SmartSpending',
+			'description' => 'Ứng dụng quản lý chi tiêu cá nhân giúp theo dõi thu/chi, lập ngân sách và xem thống kê tài chính rõ ràng.',
 			'github'      => 'https://github.com/HuyHoangI4t/Quan_Ly_Chi_Tieu',
 			'media'       => array(
 				array(
@@ -74,30 +150,64 @@ function huyhoang_portfolio_seed_projects() {
 			),
 		),
 		array(
-			'title'       => 'WEB-CB',
-			'description' => 'Dự án web cơ bản tập trung vào giao diện, cấu trúc trang và các chức năng nền tảng.',
+			'title'       => 'Chatbot TNU Assistant',
+			'description' => 'Chatbot hỗ trợ sinh viên với giao diện trò chuyện thân thiện, hỗ trợ trả lời nhanh các câu hỏi thường gặp.',
 			'github'      => 'https://github.com/HuyHoangI4t/WEB-CB',
 			'media'       => array(
 				array(
 					'type' => 'image',
 					'src'  => get_template_directory_uri() . '/assets/images/wcb1.png',
-					'alt'  => 'WEB-CB - hình 1',
+					'alt'  => 'Chatbot TNU Assistant - hình 1',
 				),
 				array(
 					'type' => 'image',
 					'src'  => get_template_directory_uri() . '/assets/images/wcb2.png',
-					'alt'  => 'WEB-CB - hình 2',
+					'alt'  => 'Chatbot TNU Assistant - hình 2',
 				),
 				array(
 					'type' => 'image',
 					'src'  => get_template_directory_uri() . '/assets/images/wcb3.png',
-					'alt'  => 'WEB-CB - hình 3',
+					'alt'  => 'Chatbot TNU Assistant - hình 3',
 				),
 			),
 		),
 	);
 }
 
+
+function huyhoang_sync_seeded_portfolio_projects() {
+	$projects = get_posts(
+		array(
+			'post_type'      => 'portfolio_project',
+			'post_status'    => 'any',
+			'numberposts'    => -1,
+			'orderby'        => 'ID',
+			'order'          => 'ASC',
+		)
+	);
+
+	$seed_projects = huyhoang_portfolio_seed_projects();
+
+	foreach ( $projects as $index => $project ) {
+		if ( ! isset( $seed_projects[ $index ] ) ) {
+			continue;
+		}
+
+		$target = $seed_projects[ $index ];
+		$post_data = array(
+			'ID'           => $project->ID,
+			'post_title'   => $target['title'],
+			'post_content' => $target['description'],
+			'post_excerpt' => $target['description'],
+			'post_name'    => sanitize_title( $target['title'] ),
+		);
+
+		wp_update_post(
+			$post_data
+		);
+	}
+}
+add_action( 'init', 'huyhoang_sync_seeded_portfolio_projects', 25 );
 function huyhoang_register_portfolio_project_cpt() {
 	register_post_type(
 		'portfolio_project',

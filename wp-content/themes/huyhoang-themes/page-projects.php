@@ -3,6 +3,44 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+function huyhoang_normalize_project_media_src( $src ) {
+	if ( empty( $src ) ) {
+		return '';
+	}
+
+	$path = (string) wp_parse_url( $src, PHP_URL_PATH );
+
+	if ( false !== strpos( $path, '/wp-content/themes/huyhoang-themes/assets/images/' ) ) {
+		$filename = wp_basename( $path );
+		return get_template_directory_uri() . '/assets/images/' . $filename;
+	}
+
+	return $src;
+}
+
+function huyhoang_get_project_display_description( $project_id ) {
+	$description = get_the_excerpt( $project_id );
+
+	if ( empty( trim( (string) $description ) ) ) {
+		$description = wp_strip_all_tags( get_post_field( 'post_content', $project_id ) );
+	}
+
+	$description = trim( wp_strip_all_tags( (string) $description ) );
+
+	if ( ! empty( $description ) ) {
+		return $description;
+	}
+
+	$fallbacks = array(
+		'SmartSpending'         => 'Ứng dụng quản lý chi tiêu cá nhân giúp theo dõi thu/chi, lập ngân sách và xem thống kê tài chính rõ ràng.',
+		'Chatbot TNU Assistant'  => 'Chatbot hỗ trợ sinh viên với giao diện trò chuyện thân thiện, hỗ trợ trả lời nhanh các câu hỏi thường gặp.',
+	);
+
+	$title = get_the_title( $project_id );
+
+	return isset( $fallbacks[ $title ] ) ? $fallbacks[ $title ] : 'Mô tả dự án đang được cập nhật.';
+}
+
 $project_query = new WP_Query(
 	array(
 		'post_type'      => 'portfolio_project',
@@ -20,7 +58,7 @@ $project_query = new WP_Query(
 		<section class="page-section projects-v2">
 			<div class="container">
 				<div class="projects-v2-head card">
-					<h2>Dự án / Portfolio</h2>
+					<h2>Dự án</h2>
 					<p class="meta">Một số dự án tiêu biểu mình đã thực hiện trong quá trình học tập.</p>
 				</div>
 				<div class="projects-list">
@@ -40,7 +78,7 @@ $project_query = new WP_Query(
 								if ( ! empty( $src ) ) {
 									$media[] = array(
 										'type' => $type ? $type : 'image',
-										'src'  => $src,
+										'src'  => huyhoang_normalize_project_media_src( $src ),
 										'alt'  => $alt ? $alt : get_the_title(),
 									);
 								}
@@ -80,7 +118,7 @@ $project_query = new WP_Query(
 									</div>
 								</div>
 								<h3><?php the_title(); ?></h3>
-								<p class="meta"><?php echo esc_html( wp_strip_all_tags( get_the_excerpt() ? get_the_excerpt() : get_the_content() ) ); ?></p>
+								<p class="meta"><?php echo esc_html( huyhoang_get_project_display_description( $project_id ) ); ?></p>
 								<p><a class="btn" href="<?php echo esc_url( $github ); ?>" target="_blank" rel="noopener noreferrer">Xem GitHub</a></p>
 							</article>
 						<?php endwhile; ?>

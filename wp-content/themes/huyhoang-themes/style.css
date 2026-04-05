@@ -94,6 +94,26 @@ a:hover {
   color: var(--primary-dark);
 }
 
+.nav-toggle {
+  display: none;
+  width: 42px;
+  height: 42px;
+  border: 1px solid #dbeafe;
+  border-radius: 10px;
+  background: #fff;
+  padding: 8px;
+  cursor: pointer;
+}
+
+.nav-toggle span {
+  display: block;
+  height: 2px;
+  width: 100%;
+  background: #1e3a8a;
+  margin: 5px 0;
+  border-radius: 999px;
+}
+
 .page-section {
   padding: 56px 0;
 }
@@ -605,20 +625,20 @@ h2 {
 
 .project-media-layout {
   display: grid;
-  grid-template-columns: minmax(0, 1.8fr) minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr);
   gap: 10px;
   margin-bottom: 12px;
 }
 
 .project-media-main {
-  height: 350px;
+  height: 360px;
 }
 
 .project-media-side {
   display: grid;
   grid-template-rows: repeat(2, 1fr);
   gap: 10px;
-  height: 350px;
+  height: 360px;
 }
 
 .project-media-sub {
@@ -1147,6 +1167,38 @@ input[type="submit"]:hover {
     grid-template-columns: 1fr;
   }
 
+  .nav-toggle {
+    display: inline-block;
+  }
+
+  .navbar {
+    position: relative;
+  }
+
+  .nav-links {
+    display: none;
+    position: absolute;
+    top: calc(100% + 10px);
+    right: 0;
+    width: min(280px, 92vw);
+    background: #fff;
+    border: 1px solid #dbeafe;
+    border-radius: 12px;
+    padding: 8px;
+    box-shadow: 0 14px 28px rgba(30, 64, 175, 0.12);
+    z-index: 20;
+  }
+
+  .nav-links.is-open {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .nav-links a {
+    display: block;
+  }
+
   .home-v2-hero,
   .resume-v2-grid,
   .home-v2-stats {
@@ -1183,8 +1235,26 @@ input[type="submit"]:hover {
     height: auto;
   }
 
+  .project-media-main,
+  .project-media-sub {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+  }
+
   .project-media-side {
-    grid-template-rows: repeat(2, minmax(120px, auto));
+    grid-template-columns: 1fr;
+    grid-template-rows: repeat(2, minmax(0, 1fr));
+  }
+
+  .project-card h3 {
+    margin: 10px 0 6px;
+  }
+
+  .project-card .meta {
+    display: block;
+    margin: 0 0 10px;
+    font-size: 14px;
+    line-height: 1.6;
   }
 
   .project-card--reverse .project-media-main,

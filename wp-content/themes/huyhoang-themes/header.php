@@ -14,11 +14,29 @@ if ( ! defined( 'ABSPATH' ) ) {
 <header class="site-header">
 	<div class="container navbar">
 		<a class="brand" href="<?php echo esc_url( home_url( '/' ) ); ?>">HuyHoang Portfolio</a>
-		<nav class="nav-links" aria-label="Main Navigation">
+		<button class="nav-toggle" type="button" aria-expanded="false" aria-controls="main-nav" aria-label="Mở menu">
+			<span></span>
+			<span></span>
+			<span></span>
+		</button>
+		<nav class="nav-links" id="main-nav" aria-label="Main Navigation">
 			<?php foreach ( huyhoang_nav_items() as $url => $label ) : ?>
 				<a href="<?php echo esc_url( $url ); ?>"><?php echo esc_html( $label ); ?></a>
 			<?php endforeach; ?>
 		</nav>
 	</div>
 </header>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+	var toggle = document.querySelector('.nav-toggle');
+	var nav = document.getElementById('main-nav');
+
+	if (!toggle || !nav) return;
+
+	toggle.addEventListener('click', function () {
+		var isOpen = nav.classList.toggle('is-open');
+		toggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+	});
+});
+</script>
 <main>

@@ -45,8 +45,8 @@ get_header();
 
 		<div class="home-v2-stats">
 			<div class="stat-card"><div class="stat-number">3+</div><div class="stat-label">Năm tại<br>Đại học</div></div>
-			<div class="stat-card"><div class="stat-number">10+</div><div class="stat-label">Dự án<br>bài tập lớn</div></div>
-			<div class="stat-card"><div class="stat-number">100%</div><div class="stat-label">Đam mê<br>Backend</div></div>
+			<div class="stat-card"><div class="stat-number">3+</div><div class="stat-label">Dự án<br>bài tập lớn</div></div>
+			<div class="stat-card"><div class="stat-number">90%</div><div class="stat-label">Đam mê<br>Backend</div></div>
 		</div>
 
 		<div class="home-v2-why">
