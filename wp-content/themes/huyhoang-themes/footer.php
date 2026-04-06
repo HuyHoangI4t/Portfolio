@@ -3,19 +3,12 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
-$get_config = function_exists( 'portfolio_get_config_value' )
-    ? 'portfolio_get_config_value'
-	: static function( $key, $default = '' ) {
-		$env = getenv( $key );
-		return false !== $env && '' !== (string) $env ? (string) $env : (string) $default;
-	};
-
-$brand_name      = $get_config( 'PORTFOLIO_BRAND_NAME', 'Portfolio' );
-$brand_role      = $get_config( 'PORTFOLIO_BRAND_ROLE', 'Backend Developer | IT Student' );
-$public_facebook = $get_config( 'PORTFOLIO_PUBLIC_FACEBOOK', 'https://facebook.com/your-profile' );
-$public_github   = $get_config( 'PORTFOLIO_PUBLIC_GITHUB', 'https://github.com/your-username' );
-$public_email    = $get_config( 'PORTFOLIO_PUBLIC_EMAIL', 'your-email@example.com' );
-$owner_name      = $get_config( 'PORTFOLIO_OWNER_NAME', 'Your Name' );
+$brand_name      = 'HuyHoang';
+$brand_role      = 'Backend Developer | IT Student at Tay Nguyen University';
+$public_facebook = 'https://facebook.com/hamm67';
+$public_github   = 'https://github.com/HuyHoangI4t';
+$public_email    = 'huyhoangpro187@gmail.com';
+$owner_name      = 'Nguyễn Huy Hoàng';
 ?>
 </main> <footer class="site-footer">
     <div class="container footer-content">

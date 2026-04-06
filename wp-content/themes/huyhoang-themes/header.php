@@ -11,7 +11,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 </head>
 <body <?php body_class(); ?>>
 <?php wp_body_open(); ?>
-<?php $brand_name = function_exists( 'portfolio_get_config_value' ) ? portfolio_get_config_value( 'PORTFOLIO_BRAND_NAME', 'Portfolio' ) : 'Portfolio'; ?>
+<?php $brand_name = 'HuyHoang Portfolio'; ?>
+<?php $current_path = isset( $_SERVER['REQUEST_URI'] ) ? untrailingslashit( sanitize_text_field( wp_unslash( $_SERVER['REQUEST_URI'] ) ) ) : ''; ?>
 <header class="site-header">
 	<div class="container navbar">
 		<a class="brand" href="<?php echo esc_url( home_url( '/' ) ); ?>"><?php echo esc_html( $brand_name ); ?></a>
@@ -22,7 +23,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 		</button>
 		<nav class="nav-links" id="main-nav" aria-label="Main Navigation">
 			<?php foreach ( portfolio_nav_items() as $url => $label ) : ?>
-				<a href="<?php echo esc_url( $url ); ?>"><?php echo esc_html( $label ); ?></a>
+				<?php
+				$link_path  = untrailingslashit( wp_parse_url( $url, PHP_URL_PATH ) );
+				$is_current = $link_path === $current_path || ( home_url( '/' ) === $url && is_front_page() );
+				?>
+				<a href="<?php echo esc_url( $url ); ?>"<?php echo $is_current ? ' aria-current="page" class="is-current"' : ''; ?>><?php echo esc_html( $label ); ?></a>
 			<?php endforeach; ?>
 		</nav>
 	</div>

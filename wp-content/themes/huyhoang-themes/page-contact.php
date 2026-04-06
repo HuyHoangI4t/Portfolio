@@ -6,21 +6,15 @@ if ( ! defined( 'ABSPATH' ) ) {
 $contact_status = isset( $_GET['contact_status'] ) ? sanitize_key( wp_unslash( $_GET['contact_status'] ) ) : '';
 $form_action    = esc_url( admin_url( 'admin-post.php' ) );
 
-$get_config = function_exists( 'portfolio_get_config_value' )
-	? 'portfolio_get_config_value'
-	: static function( $key, $default = '' ) {
-		$env = getenv( $key );
-		return false !== $env && '' !== (string) $env ? (string) $env : (string) $default;
-	};
-
-$public_email    = $get_config( 'PORTFOLIO_PUBLIC_EMAIL', 'your-email@example.com' );
-$public_phone    = $get_config( 'PORTFOLIO_PUBLIC_PHONE', '0000000000' );
-$public_address  = $get_config( 'PORTFOLIO_PUBLIC_ADDRESS', 'Your Address' );
-$public_github   = $get_config( 'PORTFOLIO_PUBLIC_GITHUB', 'https://github.com/your-username' );
-$public_facebook = $get_config( 'PORTFOLIO_PUBLIC_FACEBOOK', 'https://facebook.com/your-profile' );
-$map_embed       = $get_config( 'PORTFOLIO_PUBLIC_MAP_EMBED', 'https://www.google.com/maps' );
+$public_email    = 'huyhoangpro187@gmail.com';
+$public_phone    = '0329106783';
+$public_address  = 'Ea Drông, Buôn Hồ, Đăk Lăk';
+$public_github   = 'https://github.com/HuyHoangI4t';
+$public_facebook = 'https://www.facebook.com/hamm67';
+$map_embed       = 'https://www.google.com/maps/embed?pb=!1m17!1m12!1m3!1d3697.5167898903346!2d108.35750707483912!3d12.843904987459899!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m2!1m1!2zMTLCsDUwJzM4LjEiTiAxMDjCsDIxJzM2LjMiRQ!5e1!3m2!1svi!2s!4v1775367785588!5m2!1svi!2s';
 
 $public_phone_href = preg_replace( '/[^0-9+]/', '', $public_phone );
+$has_valid_map_embed = false !== strpos( $map_embed, '/embed' );
 
 get_header();
 ?>
@@ -94,15 +88,20 @@ get_header();
 
 		<div class="card contact-map">
 			<h3>Google Maps địa chỉ nhà</h3>
-			<iframe
-				src="<?php echo esc_url( $map_embed ); ?>"
-				width="100%"
-				height="450"
-				style="border:0;"
-				allowfullscreen=""
-				loading="lazy"
-				referrerpolicy="no-referrer-when-downgrade">
-			</iframe>
+			<?php if ( $has_valid_map_embed ) : ?>
+				<iframe
+					src="<?php echo esc_url( $map_embed ); ?>"
+					width="100%"
+					height="450"
+					style="border:0;"
+					allowfullscreen=""
+					loading="lazy"
+					referrerpolicy="no-referrer-when-downgrade">
+				</iframe>
+			<?php else : ?>
+				<p class="meta">Chưa cấu hình link Google Maps embed hợp lệ. Hãy thêm URL dạng <strong>https://www.google.com/maps/embed?pb=...</strong> vào <code>PORTFOLIO_PUBLIC_MAP_EMBED</code> trong wp-config.php.</p>
+				<p><a class="btn btn-soft" href="https://www.google.com/maps" target="_blank" rel="noopener noreferrer">Mở Google Maps</a></p>
+			<?php endif; ?>
 		</div>
 	</div>
 </section>

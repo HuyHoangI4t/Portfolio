@@ -107,7 +107,7 @@ function portfolio_handle_contact_form() {
 		exit;
 	}
 
-	$to      = portfolio_get_config_value( 'PORTFOLIO_CONTACT_TO', get_option( 'admin_email' ) );
+	$to      = 'huyhoangpro187@gmail.com';
 	$subject = '[Portfolio Contact] ' . $subject;
 	$body    = "Họ tên: {$name}\n";
 	$body   .= "Email: {$email}\n\n";
@@ -152,7 +152,7 @@ function portfolio_seed_projects() {
 		array(
 			'title'       => 'SmartSpending',
 			'description' => 'Ứng dụng quản lý chi tiêu cá nhân giúp theo dõi thu/chi, lập ngân sách và xem thống kê tài chính rõ ràng.',
-			'github'      => 'https://github.com/your-username/smartspending',
+			'github'      => 'https://github.com/HuyHoangI4t/Quan_Ly_Chi_Tieu',
 			'media'       => array(
 				array(
 					'type' => 'image',
@@ -174,7 +174,7 @@ function portfolio_seed_projects() {
 		array(
 			'title'       => 'Bomber-man',
 			'description' => 'Dự án game Bomber-man với gameplay đặt bom, vượt chướng ngại vật và tính điểm.',
-			'github'      => 'https://github.com/your-username/bomber-man',
+			'github'      => 'https://github.com/HuyHoangI4t/Bomber-man',
 			'media'       => array(
 				array(
 					'type' => 'video',
@@ -196,7 +196,7 @@ function portfolio_seed_projects() {
 		array(
 			'title'       => 'Chatbot TNU Assistant',
 			'description' => 'Chatbot hỗ trợ sinh viên với giao diện trò chuyện thân thiện, hỗ trợ trả lời nhanh các câu hỏi thường gặp.',
-			'github'      => 'https://github.com/your-username/chatbot-web',
+			'github'      => 'https://github.com/HuyHoangI4t/WEB-CB',
 			'media'       => array(
 				array(
 					'type' => 'image',
